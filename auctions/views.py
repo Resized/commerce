@@ -1,10 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Category
+from .models import User, Category, AuctionListing
 
 
 def index(request):
@@ -63,9 +64,34 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+@login_required
 def create_listing(request):
     if request.method == "POST":
-        pass
+        title = request.POST["title"]
+        description = request.POST["description"]
+        category_id = request.POST["category"]
+        user_id = request.user.id
+        starting_bid = request.POST["starting_bid"]
+        image_url = request.POST["image_url"]
+
+        try:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            # Handle the case where the category doesn't exist
+            return HttpResponse("Invalid category")
+
+        listing = AuctionListing(
+            title=title,
+            description=description,
+            category=category,
+            user_id=user_id,
+            starting_bid=starting_bid,
+            image_url=image_url
+        )
+
+        listing.save()
+
+        return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/create_listing.html", {
             "categories": Category.objects.all()
