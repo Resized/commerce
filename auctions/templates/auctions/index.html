@@ -3,5 +3,34 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    TODO
+    <div class="container">
+        <div class="row">
+            {% for listing in listings %}
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="card" style="max-width: 24rem;">
+                        {% if listing.image_url %}
+                            <img class="card-img-top" src="{{ listing.image_url }}" alt="Auction Listing Image">
+                        {% else %}
+                            <img class="card-img-top" src="https://i.imgur.com/eeImLXD.png" alt="Auction Listing Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ listing.title }}</h5>
+                            <div class="card-text">
+                                <p class="card-text">{{ listing.description }}</p>
+                                <div class="row">
+                                    <div class="col">
+                                        <a href="{% url 'view_listing' listing.id %}" class="btn btn-primary">View Listing</a>
+                                    </div>
+                                    <div class="col text-end my-auto" style="font-size: 1.5rem">
+                                        <strong>${{ listing.starting_bid }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
 {% endblock %}

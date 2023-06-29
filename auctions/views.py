@@ -9,7 +9,9 @@ from .models import User, Category, AuctionListing
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html", {
+        "listings": AuctionListing.objects.all()
+    })
 
 
 def login_view(request):
@@ -64,27 +66,39 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
-@login_required
+def view_listing(request, listing_id):
+    try:
+        listing = AuctionListing.objects.get(id=listing_id)
+    except AuctionListing.DoesNotExist:
+        return HttpResponse("Invalid listing")
+    return render(request, "auctions/listing.html", {
+        "listing": listing
+    })
+
+
 def create_listing(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
     if request.method == "POST":
         title = request.POST["title"]
         description = request.POST["description"]
-        category_id = request.POST["category"]
         user_id = request.user.id
         starting_bid = request.POST["starting_bid"]
-        image_url = request.POST["image_url"]
+        category_id = request.POST.get("category")
+        image_url = request.POST.get("image_url")
 
-        try:
-            category = Category.objects.get(id=category_id)
-        except Category.DoesNotExist:
-            # Handle the case where the category doesn't exist
-            return HttpResponse("Invalid category")
+        category = None
+        if category_id:
+            try:
+                category = Category.objects.get(id=category_id)
+            except Category.DoesNotExist:
+                return HttpResponse("Invalid category")
 
         listing = AuctionListing(
             title=title,
             description=description,
             category=category,
-            user_id=user_id,
+            user=user_id,
             starting_bid=starting_bid,
             image_url=image_url
         )
