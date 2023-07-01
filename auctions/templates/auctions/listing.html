@@ -38,6 +38,15 @@
                         {% endif %}
                     </div>
                     <div class="mb-3">
+                        {% if is_watched %}
+                            <a href="{% url 'add_to_watchlist' listing.id %}" class="link-primary">Remove listing from
+                                Watchlist</a>
+                        {% else %}
+                            <a href="{% url 'add_to_watchlist' listing.id %}" class="link-primary">Add listing to
+                                Watchlist</a>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
                         <form action="{% url 'bid' listing.id %}" method="POST">
                             {% csrf_token %}
                             <div class="input-group">

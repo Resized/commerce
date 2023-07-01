@@ -74,9 +74,14 @@ def view_listing(request, listing_id):
         listing = AuctionListing.objects.get(pk=listing_id)
     except AuctionListing.DoesNotExist:
         return HttpResponse("Invalid listing")
+    watchlist = User.objects.get(pk=request.user.id).watchlist
+    is_watched = False
+    if watchlist.filter(pk=listing_id).exists():
+        is_watched = True
     return render(request, "auctions/listing.html", {
         "listing": listing,
-        "user": request.user
+        "user": request.user,
+        "is_watched": is_watched
     })
 
 
@@ -171,6 +176,14 @@ def create_listing(request):
     return render(request, "auctions/create_listing.html", {"form": form})
 
 
-@login_required(login_url="login")
-def watchlist(request):
+def add_to_watchlist(request, listing_id):
+    watchlist = User.objects.get(pk=request.user.id).watchlist
+    if watchlist.filter(pk=listing_id).exists():
+        watchlist.remove(listing_id)
+    else:
+        watchlist.add(listing_id)
+    return HttpResponseRedirect(reverse("view_listing", args=(listing_id,)))
+
+
+def view_watchlist(request):
     return None
