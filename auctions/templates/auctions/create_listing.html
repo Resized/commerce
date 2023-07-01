@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container" style="max-width: 512px">
+    <div class="container" id="narrow">
         <form action="{% url 'create_listing' %}" method="post">
             {% csrf_token %}
             <div class="mb-3">

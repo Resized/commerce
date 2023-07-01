@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import IntegrityError
 from django import forms
@@ -8,11 +7,12 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Category, AuctionListing, Bid
+from .models import User, Category, AuctionListing, Bid, Comment
 
 
 def index(request):
     return render(request, "auctions/index.html", {
+        "title": "Active Listings",
         "listings": AuctionListing.objects.all()
     })
 
@@ -74,10 +74,11 @@ def view_listing(request, listing_id):
         listing = AuctionListing.objects.get(pk=listing_id)
     except AuctionListing.DoesNotExist:
         return HttpResponse("Invalid listing")
-    watchlist = User.objects.get(pk=request.user.id).watchlist
     is_watched = False
-    if watchlist.filter(pk=listing_id).exists():
-        is_watched = True
+    if request.user.is_authenticated:
+        watchlist = User.objects.get(pk=request.user.id).watchlist
+        if watchlist.filter(pk=listing_id).exists():
+            is_watched = True
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "user": request.user,
@@ -111,7 +112,7 @@ def bid(request, listing_id):
         form = CreateBidForm(request.POST, initial={"current_price": listing.current_price})
         if request.user == listing.user:
             form.add_error('amount', "Cannot bid on yor own listing.")
-        if request.user == listing.current_price:
+        if listing.bids.all() and request.user == listing.bids.last().user:
             form.add_error('amount', "You already have the highest bid.")
 
         if form.is_valid():
@@ -152,7 +153,6 @@ def create_listing(request):
     if request.method == "POST":
         form = CreateListingForm(request.POST)
         if form.is_valid():
-            print("hello")
             title = form.cleaned_data["title"]
             description = form.cleaned_data["description"]
             current_price = form.cleaned_data["current_price"]
@@ -165,7 +165,8 @@ def create_listing(request):
                 category=category,
                 user=request.user,
                 image_url=image_url,
-                current_price=current_price
+                current_price=current_price,
+                ia_active=True
             )
 
             listing.save()
@@ -176,6 +177,7 @@ def create_listing(request):
     return render(request, "auctions/create_listing.html", {"form": form})
 
 
+@login_required(login_url="login")
 def add_to_watchlist(request, listing_id):
     watchlist = User.objects.get(pk=request.user.id).watchlist
     if watchlist.filter(pk=listing_id).exists():
@@ -186,4 +188,57 @@ def add_to_watchlist(request, listing_id):
 
 
 def view_watchlist(request):
-    return None
+    return render(request, "auctions/index.html", {
+        "title": "My Watchlist",
+        "listings": User.objects.get(pk=request.user.id).watchlist.all()
+    })
+
+
+@login_required(login_url="login")
+def close_listing(request, listing_id):
+    try:
+        listing = AuctionListing.objects.get(pk=listing_id)
+    except AuctionListing.DoesNotExist:
+        return HttpResponse("Invalid listing")
+
+    if request.user == listing.user:
+        listing.is_active = False
+        listing.save()
+
+    return HttpResponseRedirect(reverse("view_listing", args=(listing_id,)))
+
+
+class CreateCommentForm(forms.Form):
+    comment = forms.CharField(max_length=255)
+
+
+@login_required(login_url="login")
+def add_comment(request, listing_id):
+    try:
+        listing = AuctionListing.objects.get(pk=listing_id)
+    except AuctionListing.DoesNotExist:
+        return HttpResponse("Invalid listing")
+
+    if request.method == "POST":
+        form = CreateCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.cleaned_data["comment"]
+            new_comment = Comment(
+                listing=listing,
+                user=request.user,
+                content=comment
+            )
+
+            new_comment.save()
+
+            return HttpResponseRedirect(reverse("view_listing", args=(listing_id,)))
+
+    else:
+        print("hello world")
+        form = CreateCommentForm()
+
+    return render(request, "auctions/listing.html", {
+        "form": form,
+        "listing": listing,
+        "user": request.user
+    })
