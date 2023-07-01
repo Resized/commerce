@@ -6,6 +6,64 @@
 
 
 {% block body %}
-    <h2>Listing: {{ listing.title }}</h2>
-
+    <div class="container">
+        <div class="row">
+            <div class="mb-3">
+                <h1>{{ listing.title }}</h1>
+            </div>
+            <div class="row">
+                <div class="mb-3 col-lg-6 col-sm-12">
+                    {% if listing.image_url %}
+                        <img src="{{ listing.image_url }}" alt="Listing Image"
+                             style="object-fit: cover;width: -webkit-fill-available;">
+                    {% else %}
+                        <img src="https://i.imgur.com/eeImLXD.png" alt="Listing Image"
+                             style="object-fit: cover;width: -webkit-fill-available;">
+                    {% endif %}
+                </div>
+                <div class="col-lg-6 col-sm-12">
+                    <div class="mb-1" style="font-weight: bold">
+                        Description:
+                    </div>
+                    <div class="mb-5">
+                        {{ listing.description }}
+                    </div>
+                    <div style="font-weight: bold; font-size: x-large">
+                        ${{ listing.current_price }}
+                    </div>
+                    <div class="mb-3">
+                        {{ listing.bids.all.count }} bids so far.
+                        {% if listing.bids.all.count > 0 and listing.bids.last.user.id == user.id %}
+                            Your bid is the current bid.
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <form action="{% url 'bid' listing.id %}" method="POST">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" step=".01" min="{{ listing.current_price }}" name="amount"
+                                       class="form-control"
+                                       aria-label="Amount (to the nearest dollar)">
+                                <button type="submit" class="btn btn-primary">Place Bid</button>
+                            </div>
+                            {% if form.amount.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.amount.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                    <div class="mb-3">
+                        <ul>
+                            <li>Listed by: {{ listing.user.username }}</li>
+                            <li>Category: {{ listing.category }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

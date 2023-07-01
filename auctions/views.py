@@ -1,11 +1,14 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import IntegrityError
+from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Category, AuctionListing
+from .models import User, Category, AuctionListing, Bid
 
 
 def index(request):
@@ -68,45 +71,106 @@ def register(request):
 
 def view_listing(request, listing_id):
     try:
-        listing = AuctionListing.objects.get(id=listing_id)
+        listing = AuctionListing.objects.get(pk=listing_id)
     except AuctionListing.DoesNotExist:
         return HttpResponse("Invalid listing")
     return render(request, "auctions/listing.html", {
-        "listing": listing
+        "listing": listing,
+        "user": request.user
     })
 
 
-def create_listing(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
+class CreateBidForm(forms.Form):
+    amount = forms.DecimalField(
+        min_value=0,
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get("amount")
+        if amount and amount <= self.initial["current_price"]:
+            raise forms.ValidationError("Bid amount must be greater than the current price.")
+        return amount
+
+
+@login_required(login_url="login")
+def bid(request, listing_id):
+    try:
+        listing = AuctionListing.objects.get(pk=listing_id)
+    except AuctionListing.DoesNotExist:
+        return HttpResponse("Invalid listing")
+
     if request.method == "POST":
-        title = request.POST["title"]
-        description = request.POST["description"]
-        user_id = request.user.id
-        starting_bid = request.POST["starting_bid"]
-        category_id = request.POST.get("category")
-        image_url = request.POST.get("image_url")
+        form = CreateBidForm(request.POST, initial={"current_price": listing.current_price})
+        if request.user == listing.user:
+            form.add_error('amount', "Cannot bid on yor own listing.")
+        if request.user == listing.current_price:
+            form.add_error('amount', "You already have the highest bid.")
 
-        category = None
-        if category_id:
-            try:
-                category = Category.objects.get(id=category_id)
-            except Category.DoesNotExist:
-                return HttpResponse("Invalid category")
+        if form.is_valid():
+            amount = form.cleaned_data["amount"]
 
-        listing = AuctionListing(
-            title=title,
-            description=description,
-            category=category,
-            user=user_id,
-            starting_bid=starting_bid,
-            image_url=image_url
-        )
+            new_bid = Bid(
+                user=request.user,
+                listing=listing,
+                amount=amount
+            )
+            new_bid.save()
 
-        listing.save()
+            listing.current_price = amount
+            listing.save()
 
-        return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("view_listing", args=(listing_id,)))
     else:
-        return render(request, "auctions/create_listing.html", {
-            "categories": Category.objects.all()
-        })
+        form = CreateBidForm(initial={"current_price": listing.current_price})
+
+    return render(request, "auctions/listing.html", {
+        "form": form,
+        "listing": listing,
+        "user": request.user
+    })
+
+
+class CreateListingForm(forms.Form):
+    title = forms.CharField(max_length=100)
+    description = forms.CharField()
+    current_price = forms.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    category = forms.ModelChoiceField(empty_label="Select a category (optional)", queryset=Category.objects.all(),
+                                      required=False)
+    image_url = forms.URLField(required=False)
+
+
+@login_required(login_url="login")
+def create_listing(request):
+    if request.method == "POST":
+        form = CreateListingForm(request.POST)
+        if form.is_valid():
+            print("hello")
+            title = form.cleaned_data["title"]
+            description = form.cleaned_data["description"]
+            current_price = form.cleaned_data["current_price"]
+            category = form.cleaned_data["category"]
+            image_url = form.cleaned_data["image_url"]
+
+            listing = AuctionListing(
+                title=title,
+                description=description,
+                category=category,
+                user=request.user,
+                image_url=image_url,
+                current_price=current_price
+            )
+
+            listing.save()
+
+            return HttpResponseRedirect(reverse("index"))
+    else:
+        form = CreateListingForm()
+    return render(request, "auctions/create_listing.html", {"form": form})
+
+
+@login_required(login_url="login")
+def watchlist(request):
+    return None

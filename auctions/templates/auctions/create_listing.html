@@ -5,26 +5,45 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container">
+    <div class="container" style="max-width: 512px">
         <form action="{% url 'create_listing' %}" method="post">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
+                <label for="title" class="form-label">Title:</label>
                 <input type="text" class="form-control" id="title" name="title" placeholder="Enter Title Here"
                        aria-label="Title input">
+                {% if form.title.errors %}
+                    {% for error in form.title.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                {% endif %}
             </div>
             <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                <label for="description" class="form-label">Description:</label>
+                <textarea class="form-control" id="description" name="description" rows="8"></textarea>
+                {% if form.description.errors %}
+                    {% for error in form.description.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                {% endif %}
             </div>
             <div class="mb-3">
-                <label for="starting_bid" class="form-label">Starting Bid</label>
-                <input type="number" class="form-control" id="starting_bid" name="starting_bid">
+                <label for="current_price" class="form-label">Starting Price:</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" step=".01" min="0" class="form-control" id="current_price"
+                           name="current_price">
+                </div>
+                {% if form.current_price.errors %}
+                    {% for error in form.current_price.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                {% endif %}
             </div>
             <div class="mb-3">
                 <div class="input-group">
                     <div class="input-group-prepend">
-                        <span class="input-group-text">URL</span>
+                        <span class="input-group-text">Image URL</span>
                     </div>
                     <input type="text" class="form-control" id="image_url" name="image_url"
                            placeholder="Enter Image URL"
@@ -32,12 +51,11 @@
                 </div>
                 <small class="form-text text-muted">This field is optional.</small>
             </div>
-            <div class="form-group">
-                <label for="category">Category:</label>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category:</label>
                 <select class="form-control" id="category" name="category">
-                    <option value="">Select a category (optional)</option>
-                    {% for category in categories %}
-                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% for value, label in form.category.field.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
                     {% endfor %}
                 </select>
                 <small class="form-text text-muted">This field is optional.</small>
