@@ -1,20 +1,20 @@
 {% extends "auctions/layout.html" %}
 
 {% block title %}
-
+    Auction Listing
 {% endblock %}
 
 
 {% block body %}
     <div class="container">
         <div class="row ">
-            <div class="mb-3">
-                <h1>{{ listing.title }}</h1>
+            <div class="mb-2 fs-1 fw-bold">
+                {{ listing.title }}
             </div>
         </div>
         <div class="row mb-5">
             <div class="col-lg-6 col-sm-12">
-                <div style="
+                <div class="rounded" style="
                         height: 100%;
                         width: 100%;
                         background-image: url('{{ listing.image_url }}');
@@ -33,26 +33,30 @@
                 <div class="mb-1" style="font-weight: bold">
                     Description:
                 </div>
-                <div class="mb-5">
+                <div class="mb-3">
                     {{ listing.description }}
                 </div>
-                <div style="font-weight: bold; font-size: x-large">
+                <div class="mb-3 fw-light">
+                    <ul>
+                        <li>Listed by: {{ listing.user.username }}</li>
+                        <li>Category: {{ listing.category }}</li>
+                    </ul>
+                </div>
+                <div class="fs-1 fw-bold">
                     ${{ listing.current_price }}
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 text-muted">
                     {{ listing.bids.all.count }} bids so far.
                     {% if listing.bids.all.count > 0 and listing.bids.last.user == user %}
-                        Your bid is the current bid.
+                        Your bid is the current highest.
                     {% endif %}
                 </div>
                 <div class="mb-3">
                     {% if is_watched %}
-                        <a href="{% url 'add_to_watchlist' listing.id %}" class="btn btn-secondary">Remove item
-                            from
+                        <a href="{% url 'add_to_watchlist' listing.id %}" class="btn btn-secondary">Remove from
                             Watchlist</a>
                     {% else %}
-                        <a href="{% url 'add_to_watchlist' listing.id %}" class="btn btn-secondary">Add item to
-                            Watchlist</a>
+                        <a href="{% url 'add_to_watchlist' listing.id %}" class="btn btn-secondary">Add to Watchlist</a>
                     {% endif %}
                 </div>
                 {% if listing.is_active %}
@@ -80,16 +84,10 @@
                         {% endif %}
                     </div>
                 {% elif listing.bids.all.count > 0 and listing.bids.last.user == user %}
-                    <div class="mb-3">
-                        <h2>You have won this auction!</h2>
+                    <div class="alert alert-success" role="alert">
+                        You have won this auction!
                     </div>
                 {% endif %}
-                <div class="mb-3">
-                    <ul>
-                        <li>Listed by: {{ listing.user.username }}</li>
-                        <li>Category: {{ listing.category }}</li>
-                    </ul>
-                </div>
                 <form action="{% url 'add_comment' listing.id %}" method="POST">
                     {% csrf_token %}
                     <div class="mb-3">

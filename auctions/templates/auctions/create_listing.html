@@ -6,62 +6,65 @@
 
 {% block body %}
     <div class="container" id="narrow">
-        <form action="{% url 'create_listing' %}" method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="title" class="form-label">Title:</label>
-                <input type="text" class="form-control" id="title" name="title" placeholder="Enter Title Here"
-                       aria-label="Title input">
-                {% if form.title.errors %}
-                    {% for error in form.title.errors %}
-                        <small class="text-danger">{{ error }}</small>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description:</label>
-                <textarea class="form-control" id="description" name="description" rows="8"></textarea>
-                {% if form.description.errors %}
-                    {% for error in form.description.errors %}
-                        <small class="text-danger">{{ error }}</small>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <label for="current_price" class="form-label">Starting Price:</label>
-                <div class="input-group">
-                    <span class="input-group-text">$</span>
-                    <input type="number" step=".01" min="0" class="form-control" id="current_price"
-                           name="current_price">
+        <div class="card shadow-sm">
+            <form class="px-4 py-3" action="{% url 'create_listing' %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Enter Title Here"
+                           aria-label="Title input">
+                    {% if form.title.errors %}
+                        {% for error in form.title.errors %}
+                            <small class="text-danger">{{ error }}</small>
+                        {% endfor %}
+                    {% endif %}
                 </div>
-                {% if form.current_price.errors %}
-                    {% for error in form.current_price.errors %}
-                        <small class="text-danger">{{ error }}</small>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div class="mb-3">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Image URL</span>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea class="form-control" id="description" name="description" rows="8"></textarea>
+                    {% if form.description.errors %}
+                        {% for error in form.description.errors %}
+                            <small class="text-danger">{{ error }}</small>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="current_price" class="form-label">Starting Price:</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" step=".01" min="0" class="form-control" id="current_price"
+                               name="current_price" placeholder="0.00">
                     </div>
-                    <input type="text" class="form-control" id="image_url" name="image_url"
-                           placeholder="Enter Image URL"
-                           aria-label="Image URL input">
+                    {% if form.current_price.errors %}
+                        {% for error in form.current_price.errors %}
+                            <small class="text-danger">{{ error }}</small>
+                        {% endfor %}
+                    {% endif %}
                 </div>
-                <small class="form-text text-muted">This field is optional.</small>
-            </div>
-            <div class="mb-3">
-                <label for="category" class="form-label">Category:</label>
-                <select class="form-control" id="category" name="category">
-                    {% for value, label in form.category.field.choices %}
-                        <option value="{{ value }}">{{ label }}</option>
-                    {% endfor %}
-                </select>
-                <small class="form-text text-muted">This field is optional.</small>
-            </div>
-            <button class="btn btn-primary" type="submit">Submit</button>
-        </form>
+                <div class="mb-3">
+                    <label for="image_url" class="form-label">Image URL:</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Image URL</span>
+                        <input type="text" class="form-control" id="image_url" name="image_url"
+                               placeholder="Enter Image URL"
+                               aria-label="Image URL input">
+                    </div>
+                    <small class="form-text text-muted">This field is optional.</small>
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category:</label>
+                    <select class="form-select" id="category" name="category">
+                        {% for value, label in form.category.field.choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">This field is optional.</small>
+                </div>
+                <div class="mb-2">
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}
 

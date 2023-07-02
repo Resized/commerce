@@ -242,3 +242,22 @@ def add_comment(request, listing_id):
         "listing": listing,
         "user": request.user
     })
+
+
+def all_categories(request):
+    return render(request, "auctions/categories.html", {
+        "title": "All Categories",
+        "categories": Category.objects.all()
+    })
+
+
+def view_category(request, category_id):
+    try:
+        category = Category.objects.get(pk=category_id)
+    except Category.DoesNotExist:
+        return HttpResponse("Invalid listing")
+
+    return render(request, "auctions/index.html", {
+        "title": category.name,
+        "listings": category.listings.all()
+    })

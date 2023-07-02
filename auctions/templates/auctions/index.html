@@ -1,5 +1,10 @@
 {% extends "auctions/layout.html" %}
 
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+
 {% block body %}
     <h2>{{ title }}</h2>
 
@@ -19,7 +24,8 @@
                                 <p class="card-text">{{ listing.description }}</p>
                                 <div class="row">
                                     <div class="col">
-                                        <a href="{% url 'view_listing' listing.id %}" class="btn btn-primary">View Listing</a>
+                                        <a href="{% url 'view_listing' listing.id %}" class="btn btn-primary">View
+                                            Listing</a>
                                     </div>
                                     <div class="col text-end my-auto" style="font-size: x-large; font-weight: bold">
                                         ${{ listing.current_price }}

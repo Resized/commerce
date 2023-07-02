@@ -8,7 +8,7 @@ body {
 
 .card .card-text p {
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -32,4 +32,13 @@ body {
 
 .card {
     margin: 0;
+}
+
+.nav {
+    padding: 5px;
+}
+
+.nav > a {
+    font-weight: bold;
+    margin: 5px;
 }
