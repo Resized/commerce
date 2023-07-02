@@ -46,9 +46,13 @@
                     ${{ listing.current_price }}
                 </div>
                 <div class="mb-3 text-muted">
-                    {{ listing.bids.all.count }} bids so far.
-                    {% if listing.bids.all.count > 0 and listing.bids.last.user == user %}
-                        Your bid is the current highest.
+                    {% if listing.is_active %}
+                        {{ listing.bids.all.count }} bids so far.
+                        {% if listing.bids.all.count > 0 and listing.bids.last.user == user %}
+                            Your bid is the current highest.
+                        {% endif %}
+                    {% else %}
+                        This auction is closed.
                     {% endif %}
                 </div>
                 <div class="mb-3">
