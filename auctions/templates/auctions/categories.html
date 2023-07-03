@@ -18,8 +18,13 @@
                                 <p class="card-text">{{ category.description }}</p>
                                 <div class="row">
                                     <div class="col">
-                                        <a href="{% url 'view_category' category.id %}" class="btn btn-primary"
-                                           style="display: block">View Category</a>
+                                        {% if category.listings.count > 0 %}
+                                            <a href="{% url 'view_category' category.id %}" class="btn btn-primary"
+                                               style="display: block">View Category</a>
+                                        {% else %}
+                                            <a href="{% url 'view_category' category.id %}" class="btn btn-primary disabled"
+                                               style="display: block">View Category</a>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
