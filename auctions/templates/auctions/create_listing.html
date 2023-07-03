@@ -10,6 +10,10 @@
             <form class="px-4 py-3" action="{% url 'create_listing' %}" method="post">
                 {% csrf_token %}
                 <div class="mb-3">
+                    <h2>Create Listing</h2>
+                </div>
+
+                <div class="mb-3">
                     <label for="title" class="form-label">Title:</label>
                     <input type="text" class="form-control" id="title" name="title" placeholder="Enter Title Here"
                            aria-label="Title input">

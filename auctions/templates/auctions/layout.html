@@ -9,6 +9,7 @@
     <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
 </head>
 <body>
+<div class="container">
 <h1>Auctions</h1>
 <div class="mb-1">
     {% if user.is_authenticated %}
@@ -32,5 +33,6 @@
 <hr>
 {% block body %}
 {% endblock %}
+</div>
 </body>
 </html>

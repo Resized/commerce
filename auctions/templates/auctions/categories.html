@@ -5,9 +5,8 @@
 {% endblock %}
 
 {% block body %}
-    <h2>{{ title }}</h2>
-
     <div class="container">
+        <h2>{{ title }}</h2>
         <div class="row mt-3">
             {% for category in categories %}
                 <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
@@ -22,7 +21,8 @@
                                             <a href="{% url 'view_category' category.id %}" class="btn btn-primary"
                                                style="display: block">View Category</a>
                                         {% else %}
-                                            <a href="{% url 'view_category' category.id %}" class="btn btn-primary disabled"
+                                            <a href="{% url 'view_category' category.id %}"
+                                               class="btn btn-primary disabled"
                                                style="display: block">View Category</a>
                                         {% endif %}
                                     </div>

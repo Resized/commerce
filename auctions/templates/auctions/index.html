@@ -6,17 +6,31 @@
 
 
 {% block body %}
-    <h2>{{ title }}</h2>
-
     <div class="container">
+        <h2>{{ title }}</h2>
+
         <div class="row mt-3">
             {% for listing in listings %}
                 <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                     <div class="card shadow">
                         {% if listing.image_url %}
-                            <img class="card-img-top" src="{{ listing.image_url }}" alt="Auction Listing Image">
+                            <div class="rounded-top" style="
+                            height: 100%;
+                            width: 100%;
+                            background-image: url('{{ listing.image_url }}');
+                            background-size: cover;
+                            background-position: center;
+                            background-repeat: no-repeat;
+                            padding-top: 56.25%;"></div>
                         {% else %}
-                            <img class="card-img-top" src="https://i.imgur.com/eeImLXD.png" alt="Auction Listing Image">
+                            <div class="rounded-top" style="
+                            height: 100%;
+                            width: 100%;
+                            background-image: url('https://i.imgur.com/eeImLXD.png');
+                            background-size: cover;
+                            background-position: center;
+                            background-repeat: no-repeat;
+                            padding-top: 56.25%;"></div>
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ listing.title }}</h5>
