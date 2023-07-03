@@ -42,10 +42,11 @@
                 <div class="mb-3">
                     {{ listing.description }}
                 </div>
-                <div class="mb-3 fw-light">
+                <div class="fw-light">
                     <ul>
                         <li>Listed by: {{ listing.user.username }}</li>
                         <li>Category: {{ listing.category }}</li>
+                        <li>Created: {{ listing.creation_date }}</li>
                     </ul>
                 </div>
                 <div class="fs-1 fw-bold">
