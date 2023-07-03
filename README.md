@@ -2,6 +2,8 @@
 
 This is an online auction site built with Django. Users can create listings for various items, place bids on listings, add listings to their watchlist, and interact through comments.
 
+![image](https://github.com/Resized/commerce/assets/4931622/3db90235-9afd-49f1-a0fd-f7b23fd579b9)
+
 ## Features
 
 - User registration and authentication system
