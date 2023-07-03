@@ -74,16 +74,21 @@ def view_listing(request, listing_id):
         listing = AuctionListing.objects.get(pk=listing_id)
     except AuctionListing.DoesNotExist:
         return HttpResponse("Invalid listing")
-    is_watched = False
-    if request.user.is_authenticated:
-        watchlist = User.objects.get(pk=request.user.id).watchlist
-        if watchlist.filter(pk=listing_id).exists():
-            is_watched = True
+    is_watched = get_is_watched(request, listing_id)
     return render(request, "auctions/listing.html", {
         "listing": listing,
         "user": request.user,
         "is_watched": is_watched
     })
+
+
+def get_is_watched(request, listing_id):
+    is_watched = False
+    if request.user.is_authenticated:
+        watchlist = User.objects.get(pk=request.user.id).watchlist
+        if watchlist.filter(pk=listing_id).exists():
+            is_watched = True
+    return is_watched
 
 
 class CreateBidForm(forms.Form):
@@ -107,7 +112,7 @@ def bid(request, listing_id):
         listing = AuctionListing.objects.get(pk=listing_id)
     except AuctionListing.DoesNotExist:
         return HttpResponse("Invalid listing")
-
+    is_watched = get_is_watched(request, listing_id)
     if request.method == "POST":
         form = CreateBidForm(request.POST, initial={"current_price": listing.current_price})
         if request.user == listing.user:
@@ -135,7 +140,8 @@ def bid(request, listing_id):
     return render(request, "auctions/listing.html", {
         "form": form,
         "listing": listing,
-        "user": request.user
+        "user": request.user,
+        "is_watched": is_watched
     })
 
 
@@ -166,7 +172,7 @@ def create_listing(request):
                 user=request.user,
                 image_url=image_url,
                 current_price=current_price,
-                ia_active=True
+                is_active=True
             )
 
             listing.save()

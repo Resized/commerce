@@ -12,24 +12,30 @@
                 {{ listing.title }}
             </div>
         </div>
-        <div class="row mb-5">
-            <div class="col-lg-6 col-sm-12">
-                <div class="rounded" style="
-                        height: 100%;
-                        width: 100%;
-                        background-image: url('{{ listing.image_url }}');
-                        background-size: cover;
-                        background-position: center;
-                        background-repeat: no-repeat;">
-                    {% if listing.image_url %}
-                        <!--<img src="{{ listing.image_url }}" alt="Listing Image">-->
-                    {% else %}
-                        <img src="https://i.imgur.com/eeImLXD.png" alt="Listing Image"
-                             style="object-fit: cover;width: -webkit-fill-available;">
-                    {% endif %}
-                </div>
+        <div class="row mb-3">
+            <div class="col-lg-6 col-sm-12 mb-3">
+                {% if listing.image_url %}
+                    <div class="rounded" style="
+                            height: 100%;
+                            width: 100%;
+                            background-image: url('{{ listing.image_url }}');
+                            background-size: cover;
+                            background-position: center;
+                            background-repeat: no-repeat;
+                            padding-top: 56.25%;"></div>
+
+                {% else %}
+                    <div class="rounded" style="
+                    height: 100%;
+                    width: 100%;
+                    background-image: url('https://i.imgur.com/eeImLXD.png');
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    padding-top: 56.25%;"></div>
+                {% endif %}
             </div>
-            <div class="col-lg-6 col-sm-12">
+            <div class="col-lg-6 col-sm-12 mb-3">
                 <div class="mb-1" style="font-weight: bold">
                     Description:
                 </div>
@@ -60,7 +66,8 @@
                         <a href="{% url 'add_to_watchlist' listing.id %}" class="btn btn-secondary">Remove from
                             Watchlist</a>
                     {% else %}
-                        <a href="{% url 'add_to_watchlist' listing.id %}" class="btn btn-secondary">Add to Watchlist</a>
+                        <a href="{% url 'add_to_watchlist' listing.id %}" class="btn btn-secondary">Add to
+                            Watchlist</a>
                     {% endif %}
                 </div>
                 {% if listing.is_active %}
@@ -75,13 +82,13 @@
                                            aria-label="Amount (to the nearest dollar)">
                                     <button type="submit" class="btn btn-primary">Place Bid</button>
                                 </div>
-                                {% if form.amount.errors %}
-                                    <div class="text-danger">
+                                <div class="text-danger" style="height: 1rem">
+                                    {% if form.amount.errors %}
                                         {% for error in form.amount.errors %}
                                             <small>{{ error }}</small>
                                         {% endfor %}
-                                    </div>
-                                {% endif %}
+                                    {% endif %}
+                                </div>
                             </form>
                         {% else %}
                             <a href="{% url 'close_listing' listing.id %}" class="btn btn-danger">Close Listing</a>

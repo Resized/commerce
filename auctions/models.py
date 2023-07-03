@@ -40,7 +40,7 @@ class Bid(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.id} - ${self.amount} on {self.listing.title} by {self.user.username} at [{self.timestamp.strftime('%d-%m-%Y, %H:%M:%S')}]"
+        return f"{self.id} - ${self.amount} on \"{self.listing.title}\" by {self.user.username} at [{self.timestamp.strftime('%d-%m-%Y, %H:%M:%S')}]"
 
 
 class Comment(models.Model):
@@ -49,3 +49,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     timestamp = models.DateTimeField(auto_now_add=True)
     content = models.TextField(max_length=255)
+
+    def __str__(self):
+        return f"{self.id} - {self.user.username} on \"{self.listing.title}\" - [{self.timestamp.strftime('%d-%m-%Y, %H:%M:%S')}]"
+

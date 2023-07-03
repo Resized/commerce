@@ -39,6 +39,21 @@ body {
 }
 
 .nav > a {
-    font-weight: bold;
+    font-weight: 600;
     margin: 5px;
+    display: inline-block;
+    text-align: center;
+}
+
+.nav > a:hover {
+    font-weight: 700;
+}
+
+.nav > a::before {
+    display: block;
+    content: attr(title);
+    font-weight: 700;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
 }
